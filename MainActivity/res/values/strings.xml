@@ -1,0 +1,12 @@
+<resources>
+
+    <string name="app_name">Govorun</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Govorun</string>
+    <string name="enter_some_text">Enter some text:</string>
+    <string name="speak">Speak</string>
+    <string name="intro">Press the button to speak!</string>
+    <string name="listen">Speak now!</string>
+    <string name="word_intro">Suggested words&#8230;</string>
+    
+</resources>
