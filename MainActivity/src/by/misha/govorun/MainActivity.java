@@ -3,6 +3,7 @@ package by.misha.govorun;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -41,6 +42,10 @@ public class MainActivity extends Activity implements OnClickListener, OnInitLis
 	//Text To Speech instance
 	private TextToSpeech myTTS;
 	
+	private int maxNumber = 10;
+	private int number1;
+	private int number2;
+
 	//create the Activity
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,8 +105,11 @@ public class MainActivity extends Activity implements OnClickListener, OnInitLis
 	    else if (v.getId() == R.id.speak) {
 			//get the text entered
 	    	EditText enteredText = (EditText)findViewById(R.id.enter);
-	    	String words = enteredText.getText().toString();
-	    	speakWords(words);
+//	    	String words = enteredText.getText().toString();
+//	    	speakWords(words);
+	    	
+	    	generateNewTask();
+	    	enteredText.setText(new String(number1 + " + " + number2 + " = ?"));
 	    }
 	}
 	
@@ -110,6 +118,15 @@ public class MainActivity extends Activity implements OnClickListener, OnInitLis
 
 		//speak straight away
     	myTTS.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
+	}
+	
+	//speak the user text
+	private void generateNewTask() {
+		
+		Random r = new Random();
+		number1 = r.nextInt(maxNumber);
+		number2 = r.nextInt(maxNumber);
+		speakWords(new String(number1 + " plus " + number2 + " equals?"));
 	}
 	
 	// Instruct the app to listen for user speech input
