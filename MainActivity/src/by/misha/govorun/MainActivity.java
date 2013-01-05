@@ -1,3 +1,10 @@
+/*
+ *  1. timer
+ *  2. statistics
+ *  3. START and STOP button
+ *  
+ *  
+ */
 package by.misha.govorun;
 
 import java.util.ArrayList;
@@ -34,8 +41,7 @@ public class MainActivity extends Activity implements OnClickListener, OnInitLis
 	private static final int VR_REQUEST = 999;
 	//ListView for displaying suggested words
 	private ListView wordList;
-	//Log tag for output information
-	private final String LOG_TAG = "SpeechRepeatActivity";//***enter your own tag here***
+
 	//TTS variables
 	//variable for checking TTS engine data on user device
 	private int MY_DATA_CHECK_CODE = 0;
@@ -45,6 +51,9 @@ public class MainActivity extends Activity implements OnClickListener, OnInitLis
 	private int maxNumber = 10;
 	private int number1;
 	private int number2;
+	
+	//Log tag for output information
+	private static final String TAG = "myLogs";
 
 	//create the Activity
     @Override
@@ -89,7 +98,7 @@ public class MainActivity extends Activity implements OnClickListener, OnInitLis
                 //retrieve the chosen word
                 String wordChosen = (String) wordView.getText();
                 //output for debugging
-                Log.v(LOG_TAG, "chosen: "+wordChosen);
+                Log.v(TAG, "chosen: "+wordChosen);
                 //output Toast message
                 Toast.makeText(MainActivity.this, "You said: "+wordChosen, Toast.LENGTH_SHORT).show();//**alter for your Activity name***
             }
@@ -98,6 +107,7 @@ public class MainActivity extends Activity implements OnClickListener, OnInitLis
 	
 	//respond to button clicks
 	public void onClick(View v) {
+/*
 	    if (v.getId() == R.id.listen_btn) {
 	        //listen for results
 	        listenToSpeech();
@@ -111,6 +121,15 @@ public class MainActivity extends Activity implements OnClickListener, OnInitLis
 	    	generateNewTask();
 	    	enteredText.setText(new String(number1 + " + " + number2 + " = ?"));
 	    }
+*/
+		// generate a new task
+    	generateNewTask();
+		//get the text entered
+    	EditText enteredText = (EditText)findViewById(R.id.enter);
+    	String task = new String(number1 + " + " + number2 + " = ?");
+    	enteredText.setText(task);
+        //listen for results
+        listenToSpeech(task);
 	}
 	
 	//speak the user text
@@ -118,6 +137,7 @@ public class MainActivity extends Activity implements OnClickListener, OnInitLis
 
 		//speak straight away
     	myTTS.speak(speech, TextToSpeech.QUEUE_FLUSH, null);
+    	myTTS.playSilence(200, TextToSpeech.QUEUE_FLUSH, null);
 	}
 	
 	//speak the user text
@@ -130,19 +150,20 @@ public class MainActivity extends Activity implements OnClickListener, OnInitLis
 	}
 	
 	// Instruct the app to listen for user speech input
-	private void listenToSpeech() {
+	private void listenToSpeech(String task) {
 	    //start the speech recognition intent passing required data
 	    Intent listenIntent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
 	    //indicate package
 	    listenIntent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getClass().getPackage().getName());
 	    //message to display while listening
-	    listenIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Say a word!");
+	    listenIntent.putExtra(RecognizerIntent.EXTRA_PROMPT, task);
 	    //set speech model
 	    listenIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
 	    //specify number of results to retrieve
 	    listenIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 10);
 	    //specify language
-	    listenIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ru-RU");
+//	    listenIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ru-RU");
+	    listenIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
 	    //start listening
 	    startActivityForResult(listenIntent, VR_REQUEST);
 	}
@@ -184,8 +205,28 @@ public class MainActivity extends Activity implements OnClickListener, OnInitLis
         {
             //store the returned word list as an ArrayList
             ArrayList<String> suggestedWords = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+            for (String s : suggestedWords)
+            {
+                try  
+                {  
+              	  int result = Integer.parseInt(s);
+              	  if (result == number1 + number2)
+              	  {
+              		  Toast.makeText(this, "Good job!", Toast.LENGTH_LONG).show();
+              		  Log.d(TAG, result + "is a correct answer");
+              	  }
+              	  else
+              	  {
+              		  Log.d(TAG, result + "is an incorrect answer");
+              	  }
+              	  break;
+                }  
+                catch(NumberFormatException nfe)
+                {  
+                }  
+            }
             //set the retrieved list to display in the ListView using an ArrayAdapter
-            wordList.setAdapter(new ArrayAdapter<String> (this, R.layout.word, suggestedWords));
+//            wordList.setAdapter(new ArrayAdapter<String> (this, R.layout.word, suggestedWords));
         }
         //tts code here
 		if (requestCode == MY_DATA_CHECK_CODE) {
